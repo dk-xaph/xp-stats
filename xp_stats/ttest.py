@@ -1,11 +1,10 @@
+from dataclasses import dataclass
 from typing import Union
 
 import numpy as np
-from dataclasses import dataclass
 from scipy.stats import t
 
 from xp_stats import constants as C
-from scipy.stats import ttest_ind
 
 
 @dataclass
