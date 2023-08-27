@@ -10,6 +10,15 @@ from scipy.stats import ttest_ind
 
 @dataclass
 class TTestResult:
+    """
+    Represents the result of a T-test.
+
+    Attributes:
+        lift: The observed lift or difference in means between the two groups.
+        pvalue: The p-value resulting from the T-test, indicating the significance of the results.
+        ci_lower: The lower bound of the confidence interval for the effect size.
+        ci_upper: The upper bound of the confidence interval for the effect size.
+    """
     lift: float
     pvalue: float
     ci_lower: float
@@ -63,7 +72,7 @@ def ttest_from_stats(
 
     return TTestResult(
         lift=lift,
-        p_value=pvalue,
+        pvalue=pvalue,
         ci_lower=ci_lower,
         ci_upper=ci_upper
     )
