@@ -36,6 +36,34 @@ def ttest_from_stats(
         alternative: str = C.TWO_SIDED_ALTERNATIVE,
         relative: bool = False
 ):
+    """
+    Perform a Welch's t-test based on summary statistics.
+
+    Args:
+        mean1: Mean of the first sample.
+        std1: Standard deviation of the first sample.
+        nobs1: Number of observations in the first sample.
+        mean2: Mean of the second sample.
+        std2: Standard deviation of the second sample.
+        nobs2: Number of observations in the second sample.
+        alpha: Significance level for the test. Defaults to 0.05.
+        alternative: The alternative hypothesis for the test. Can be 'two-sided',
+            'greater', or 'less'. Defaults to 'two-sided'.
+        relative: If True, calculate the relative lift between means. Defaults to False.
+
+    Returns:
+        TTestResult: An object containing the t-test results including lift, p-value, and confidence interval.
+
+    Raises:
+        ValueError: If `alternative` is not one of 'two-sided', 'greater', or 'less'.
+
+    Notes:
+        - This function supports both absolute and relative lift calculations.
+        - The confidence interval is calculated based on the specified `alpha` level.
+
+    Example:
+        result = ttest_from_stats(mean1=10, std1=2, nobs1=100, mean2=12, std2=2.5, nobs2=120)
+    """
     vn1 = std1 ** 2 / nobs1
     vn2 = std2 ** 2 / nobs2
 
@@ -85,6 +113,32 @@ def ttest(
         alpha: float = 0.05,
         relative: bool = False
 ) -> TTestResult:
+    """
+    Perform a Welch's t-test between two samples.
+
+    Args:
+        sample1: The first sample data as a NumPy array.
+        sample2: The second sample data as a NumPy array.
+        alternative: The alternative hypothesis for the test. Can be 'two-sided',
+            'greater', or 'less'. Defaults to 'two-sided'.
+        alpha: Significance level for the test. Defaults to 0.05.
+        relative: If True, calculate the relative lift between means. Defaults to False.
+
+    Returns:
+        TTestResult: An object containing the t-test results including lift, p-value, and confidence interval.
+
+    Raises:
+        ValueError: If `alternative` is not one of 'two-sided', 'greater', or 'less'.
+
+    Notes:
+        - This function calculates the sample means, standard deviations, and number of observations for the two samples.
+        - The t-test is then performed using the `ttest_from_stats` function.
+
+    Example:
+        sample1 = np.array([10, 12, 15, 8, 9])
+        sample2 = np.array([18, 20, 22, 16, 19])
+        result = ttest(sample1=sample1, sample2=sample2)
+    """
     mean1, std1, nobs1 = np.mean(sample1), np.std(sample1, ddof=1), len(sample1)
     mean2, std2, nobs2 = np.mean(sample2), np.std(sample2, ddof=1), len(sample2)
 
