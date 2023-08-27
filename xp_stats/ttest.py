@@ -63,6 +63,12 @@ def ttest_from_stats(
     Example:
         result = ttest_from_stats(mean1=10, std1=2, nobs1=100, mean2=12, std2=2.5, nobs2=120)
     """
+    if alpha <= 0 or alpha >= 1:
+        raise ValueError(f'Invalid alpha level: {alpha}. Can be from 0 to 1.')
+
+    if alternative not in C.ALTERNATIVES:
+        raise ValueError(f'Invalid alternative: {alternative}. Can be "two-sided", "greater", or "less".')
+
     vn1 = std1 ** 2 / nobs1
     vn2 = std2 ** 2 / nobs2
 
@@ -138,6 +144,12 @@ def ttest(
         sample2 = np.array([18, 20, 22, 16, 19])
         result = ttest(sample1=sample1, sample2=sample2)
     """
+    if alpha <= 0 or alpha >= 1:
+        raise ValueError(f'Invalid alpha level: {alpha}. Can be from 0 to 1.')
+
+    if alternative not in C.ALTERNATIVES:
+        raise ValueError(f'Invalid alternative: {alternative}. Can be "two-sided", "greater", or "less".')
+
     mean1, std1, nobs1 = np.mean(sample1), np.std(sample1, ddof=1), len(sample1)
     mean2, std2, nobs2 = np.mean(sample2), np.std(sample2, ddof=1), len(sample2)
 
