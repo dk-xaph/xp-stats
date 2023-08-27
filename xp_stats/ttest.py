@@ -26,12 +26,12 @@ class TTestResult:
 
 
 def ttest_from_stats(
-        mean1: float,
-        std1: float,
-        nobs1:  int,
-        mean2:  float,
-        std2: float,
-        nobs2:  int,
+        mean1: Union[float, np.array],
+        std1: Union[float, np.array],
+        nobs1:  Union[int, np.array],
+        mean2:  Union[float, np.array],
+        std2: Union[float, np.array],
+        nobs2:  Union[int, np.array],
         alpha: float = 0.05,
         alternative: str = C.TWO_SIDED_ALTERNATIVE,
         relative: bool = False
