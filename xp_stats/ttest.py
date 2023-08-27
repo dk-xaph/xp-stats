@@ -77,6 +77,7 @@ def ttest_from_stats(
         std_err = np.sqrt(vn1 + vn2)
     else:
         lift = mean2 / mean1 - 1
+        # Applying Delta Method for Variance
         std_err = np.sqrt((vn1 + vn2) / mean1**2 + vn1*(mean2 - mean1)**2 / mean1**4 + 2*vn1*(mean2 - mean1) / mean1**3)
 
     df = (vn1 + vn2)**2 / (vn1**2/(nobs1 - 1) + vn2**2/(nobs2 - 1))
