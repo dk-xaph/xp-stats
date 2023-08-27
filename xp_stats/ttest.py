@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Union
+from typing import Union, Tuple
 
 import numpy as np
 from scipy.stats import t
@@ -22,6 +22,68 @@ class TTestResult:
     pvalue: float
     ci_lower: float
     ci_upper: float
+
+
+def _calculate_pvalue(t_stat: float, df: float, alternative: str) -> float:
+    """
+    Calculate the p-value based on the t-statistic and degrees of freedom.
+
+    Args:
+        t_stat: The calculated t-statistic.
+        df: Degrees of freedom.
+        alternative: The alternative hypothesis for the test.
+
+    Returns:
+        float: The calculated p-value.
+    """
+    if alternative == C.TWO_SIDED_ALTERNATIVE:
+        pvalue = t.cdf(x=-np.abs(t_stat), df=df) * 2
+    elif alternative == C.GREATER_ALTERNATIVE:
+        pvalue = 1 - t.cdf(x=t_stat, df=df)
+    elif alternative == C.LESS_ALTERNATIVE:
+        pvalue = t.cdf(x=t_stat, df=df)
+    else:
+        raise ValueError(f'Invalid alternative: {alternative}. Can be "two-sided", "greater", or "less".')
+
+    return pvalue
+
+
+def _calculate_confidence_interval(
+        lift: float,
+        std_err: float,
+        df: float,
+        alpha: float,
+        alternative: str
+) -> Tuple[float, float]:
+    """
+    Calculate the confidence interval based on lift, standard error, degrees of freedom, and alpha.
+
+    Args:
+        lift: The calculated lift.
+        std_err: The calculated standard error.
+        df: Degrees of freedom.
+        alpha: Significance level.
+        alternative: The alternative hypothesis for the test.
+
+    Returns:
+        tuple: A tuple containing the lower and upper bounds of the confidence interval.
+    """
+    if alternative == C.TWO_SIDED_ALTERNATIVE:
+        t_crit = t.ppf(q=1-alpha/2, df=df)
+        ci_lower = lift - t_crit * std_err
+        ci_upper = lift + t_crit * std_err
+    elif alternative == C.GREATER_ALTERNATIVE:
+        t_crit = t.ppf(q=1-alpha, df=df)
+        ci_lower = lift - t_crit * std_err
+        ci_upper = np.nan  # No upper bound for greater alternative
+    elif alternative == C.LESS_ALTERNATIVE:
+        t_crit = t.ppf(q=1-alpha, df=df)
+        ci_lower = np.nan  # No lower bound for less alternative
+        ci_upper = lift + t_crit * std_err
+    else:
+        raise ValueError(f'Invalid alternative: {alternative}. Can be "two-sided", "greater", or "less".')
+
+    return ci_lower, ci_upper
 
 
 def ttest_from_stats(
@@ -77,32 +139,16 @@ def ttest_from_stats(
         std_err = np.sqrt(vn1 + vn2)
     else:
         lift = mean2 / mean1 - 1
-        # Applying Delta Method for Variance
+        # Estimating standard error using Delta Method.
         std_err = np.sqrt((vn1 + vn2) / mean1**2 + vn1*(mean2 - mean1)**2 / mean1**4 + 2*vn1*(mean2 - mean1) / mean1**3)
 
     df = (vn1 + vn2)**2 / (vn1**2/(nobs1 - 1) + vn2**2/(nobs2 - 1))
     t_stat = lift / std_err
 
-    # P-value
-    if alternative == C.TWO_SIDED_ALTERNATIVE:
-        pvalue = t.cdf(x=-np.abs(t_stat), df=df) * 2
-    elif alternative == C.GREATER_ALTERNATIVE:
-        pvalue = 1 - t.cdf(x=t_stat, df=df)
-    elif alternative == C.LESS_ALTERNATIVE:
-        pvalue = t.cdf(x=t_stat, df=df)
-
-    # Confidence Interval
-    ci_lower, ci_upper = np.nan, np.nan
-    if alternative == C.TWO_SIDED_ALTERNATIVE:
-        t_crit = t.ppf(q=1-alpha/2, df=df)
-        ci_lower = lift - t_crit * std_err
-        ci_upper = lift + t_crit * std_err
-    elif alternative == C.GREATER_ALTERNATIVE:
-        t_crit = t.ppf(q=1-alpha, df=df)
-        ci_lower = lift - t_crit * std_err
-    elif alternative == C.LESS_ALTERNATIVE:
-        t_crit = t.ppf(q=1-alpha, df=df)
-        ci_upper = lift + t_crit * std_err
+    pvalue = _calculate_pvalue(t_stat=t_stat, df=df, alternative=alternative)
+    ci_lower, ci_upper = _calculate_confidence_interval(
+        lift=lift, std_err=std_err, df=df, alpha=alpha, alternative=alternative
+    )
 
     return TTestResult(
         lift=lift,
