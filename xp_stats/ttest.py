@@ -99,11 +99,3 @@ def ttest(
         alpha=alpha,
         relative=relative
     )
-
-
-if __name__ == '__main__':
-    control1 = np.random.normal(loc=1, scale=1, size=1000)
-    control2 = np.random.normal(loc=1.2, scale=1, size=1000)
-
-    print(ttest_ind(a=control1, b=control2, equal_var=False, alternative='two-sided'))
-    print(ttest(control1, control2, alternative='two-sided', relative=True))
