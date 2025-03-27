@@ -10,6 +10,7 @@ packages = [{include = "xp_stats"}]
 [tool.poetry.dependencies]
 python = ">=3.9,<3.11"
 scipy = "^1.11.1"
+pytest = "^7.4.2"
 
 
 [build-system]

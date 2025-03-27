@@ -23,6 +23,9 @@ class TTestResult:
     ci_lower: float
     ci_upper: float
 
+    def __eq__(self, other):
+        return self.lift == other.lift and self.pvalue == other.pvalue and self.ci_lower == other.ci_lower
+
 
 def _calculate_pvalue(t_stat: float, df: float, alternative: str) -> float:
     """
